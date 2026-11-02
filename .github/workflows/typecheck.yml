@@ -1,0 +1,40 @@
+name: Typecheck & Test
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_call:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Lua 5.1
+        uses: leafo/gh-actions-lua@v11
+        with:
+          luaVersion: "5.1.5"
+
+      - name: Syntax Check (Lua 5.1)
+        run: |
+          luac -p locales/*.lua core/*.lua ui/*.lua types.lua tests/test_train_wrecker.lua
+
+      - name: Run Unit Tests
+        run: |
+          lua tests/test_train_wrecker.lua
+
+      - name: Setup WoW Type Definitions
+        run: |
+          chmod +x ./scripts/setup_types.sh
+          ./scripts/setup_types.sh
+
+      - name: Run LuaLS Typecheck
+        uses: mrcjkb/lua-typecheck-action@v1.1.0
+        with:
+          checklevel: Warning

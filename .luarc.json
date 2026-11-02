@@ -1,0 +1,13 @@
+{
+	"runtime.version": "Lua 5.1",
+	"workspace.library": [
+		".types/wow-api/Annotations"
+	],
+	"workspace.ignoreDir": [
+		"libs",
+		".types",
+		"scripts"
+	],
+	"diagnostics.libraryFiles": "Disable",
+	"diagnostics.ignoredFiles": "Disable"
+}

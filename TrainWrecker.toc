@@ -1,0 +1,12 @@
+## Interface: 120100, 50504
+## Title: Train Wrecker
+## Notes: Detects Toy Train Sets and prompts to deploy the Wind-Up Train Wrecker.
+## Author: LVE
+## Version: @project-version@
+# FileDataID: inv_misc_head_clockworkgnome_01
+## IconTexture: 134152
+## Category: Miscellaneous
+## SavedVariables: TrainWreckerDB
+## X-Curse-Project-ID: REPLACE_WITH_CURSE_PROJECT_ID
+
+main.xml

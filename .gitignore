@@ -1,0 +1,12 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Lua Language Server definitions
+.types/
+
+# Agent session artifacts (preserve committed rules)
+.agents/*
+!.agents/rules/

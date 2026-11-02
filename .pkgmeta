@@ -1,0 +1,18 @@
+package-as: TrainWrecker
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+
+ignore:
+  - .agents
+  - .github
+  - .gitignore
+  - .luarc.json
+  - .markdownlint.json
+  - .prettierrc
+  - .types
+  - docs
+  - scripts
+  - tests
+  - types.lua

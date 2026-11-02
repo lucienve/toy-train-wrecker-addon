@@ -1,0 +1,14 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<!-- Localization Dictionaries -->
+	<Include file="locales/locales.xml"/>
+
+	<!-- Button Templates -->
+	<Button name="TrainWreckerActionButtonTemplate" inherits="SecureActionButtonTemplate, UIPanelButtonTemplate" virtual="true"/>
+
+	<!-- Core Lifecycle & Detection -->
+	<Script file="core/init.lua"/>
+	<Script file="core/detector.lua"/>
+
+	<!-- User Interface -->
+	<Script file="ui/dialog.lua"/>
+</Ui>
