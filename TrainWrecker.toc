@@ -7,6 +7,6 @@
 ## IconTexture: 134152
 ## Category: Miscellaneous
 ## SavedVariables: TrainWreckerDB
-## X-Curse-Project-ID: REPLACE_WITH_CURSE_PROJECT_ID
+## X-Curse-Project-ID: 1779465
 
 main.xml
