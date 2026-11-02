@@ -17,7 +17,7 @@ jobs:
           submodules: recursive
 
       - name: Setup Lua 5.1
-        uses: leafo/gh-actions-lua@v11
+        uses: leafo/gh-actions-lua@v13
         with:
           luaVersion: "5.1.5"
 
