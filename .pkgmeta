@@ -9,9 +9,13 @@ ignore:
   - .github
   - .gitignore
   - .luarc.json
+  - .markdownlint-cli2.jsonc
   - .markdownlint.json
+  - .pkgmeta
   - .prettierrc
+  - .pylintrc
   - .types
+  - README.md
   - docs
   - scripts
   - tests

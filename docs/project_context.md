@@ -56,6 +56,14 @@ destroy the train.
      `CooldownFrameTemplate` swipe overlay on the button icon.
    - The button remains enabled and clickable at all times.
 
+8. **CurseForge Packaging & Bundle Exclusions:**
+   - Configured CurseForge Project ID `1779465` in
+     [TrainWrecker.toc](../TrainWrecker.toc).
+   - Configured [.pkgmeta](../.pkgmeta) `ignore:` rules to exclude all
+     development, linting, CI/CD, test, and documentation files so only runtime
+     addon files (`TrainWrecker.toc`, `main.xml`, `locales/`, `core/`, `ui/`),
+     `CHANGELOG.md`, and `LICENSE` are bundled into the release archive.
+
 ## Completed Tasks
 
 - [x] Initial repository structure and Git configuration
