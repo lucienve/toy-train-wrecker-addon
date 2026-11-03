@@ -64,6 +64,22 @@ destroy the train.
      addon files (`TrainWrecker.toc`, `main.xml`, `locales/`, `core/`, `ui/`),
      `CHANGELOG.md`, and `LICENSE` are bundled into the release archive.
 
+9. **Automatic Dialog Channel Muting & Safe Restoration:**
+   - Listens for Toy Train Set placement (`61031`), pulses (`61551`), and the
+     player train aura (`61551`) via `UNIT_AURA` registered specifically for
+     `player`.
+   - Sets `Sound_EnableDialog` to `"0"` and records
+     `TrainWreckerDB.soundMuted = true` only if `Sound_EnableDialog` was
+     originally `"1"`, preserving user preferences if already disabled.
+   - Enforces a 15-second grace window after placement and pulse casts alongside
+     `C_Timer.After` so unrelated player buff churn does not prematurely unmute.
+   - Restores sound immediately upon Wind-Up Train Wrecker deployment (`62943`)
+     or buff expiration.
+   - Restores sound on `PLAYER_ENTERING_WORLD` if the player logged out while
+     muted.
+   - Suspends muting during active boss encounters via
+     `C_InstanceEncounter.IsEncounterInProgress()`.
+
 ## Completed Tasks
 
 - [x] Initial repository structure and Git configuration
@@ -79,6 +95,8 @@ destroy the train.
 - [x] Localization dictionary in [locales/enUS.lua](../locales/enUS.lua)
 - [x] Core lifecycle and slash commands in [core/init.lua](../core/init.lua)
 - [x] Spell detection, dedup, and ownership checking in
+      [core/detector.lua](../core/detector.lua)
+- [x] Automatic Dialog sound muting and restoration in
       [core/detector.lua](../core/detector.lua)
 - [x] UI dialog, secure action button, and combat queueing in
       [ui/dialog.lua](../ui/dialog.lua)

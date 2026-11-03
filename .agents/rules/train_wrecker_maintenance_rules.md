@@ -37,8 +37,10 @@ safeguards before modifying the codebase:
 - **`core/init.lua`:** Addon lifecycle, SavedVariables initialization on
   `ADDON_LOADED`, and slash command registrations (`/trainwrecker`, `/tw`).
 - **`core/detector.lua`:** Event frame monitoring `UNIT_SPELLCAST_SUCCEEDED`,
-  `TOYS_UPDATED`, and `BAG_UPDATE_DELAYED`. Handles spell deduplication, secret
-  value guards, toy/bag ownership verification, and culprit tracking.
+  `UNIT_AURA`, `PLAYER_ENTERING_WORLD`, `TOYS_UPDATED`, and
+  `BAG_UPDATE_DELAYED`. Handles spell deduplication, secret value guards,
+  toy/bag ownership verification, culprit tracking, and automatic Dialog channel
+  sound muting and restoration.
 - **`ui/dialog.lua`:** The "Silence the train" dialog UI, wrapping a
   `SecureActionButtonTemplate` button with a `CooldownFrameTemplate` swipe
   overlay, combat lockdown queues, and dragging safeguards.
@@ -94,6 +96,20 @@ Because the dialog contains a `SecureActionButtonTemplate` child frame:
 5. **Secret Value Guard:** Check `issecretvalue` on `spellID`, `castGUID`,
    `unitTarget`, and `sourceName` before processing to remain safe during
    restricted encounters in modern clients.
+
+### Automatic Dialog Sound Muting & Restoration
+
+1. **State Preservation:** Only set `TrainWreckerDB.soundMuted = true` if
+   `Sound_EnableDialog` was originally `"1"`. Never override or unmute the
+   channel if the user already had it disabled.
+2. **Placement Grace Period:** Enforce a 15-second grace window after placement
+   (`61031`) or pulse (`61551`) casts so unrelated player aura changes do not
+   prematurely unmute before periodic pulses land.
+3. **Session Recovery:** Always check `TrainWreckerDB.soundMuted` on
+   `PLAYER_ENTERING_WORLD` to restore audio if a previous session closed while
+   muted.
+4. **Encounter Safety:** Never mute Dialog sound while
+   `C_InstanceEncounter.IsEncounterInProgress()` returns true.
 
 ---
 

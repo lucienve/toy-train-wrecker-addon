@@ -3,10 +3,16 @@
 local registeredFrames = {}
 local currentTime = 1000
 local inCombat = false
+local inEncounter = false
 local mockToys = {}
 local mockItems = {}
 local mockCooldowns = {}
 local mockUnits = {}
+local mockCVars = {
+	["Sound_EnableDialog"] = "1",
+}
+local mockPlayerAuras = {}
+local scheduledTimers = {}
 
 -- Mock global WoW environment
 rawset(_G, "UIParent", {})
@@ -45,6 +51,51 @@ _G.C_Container = {
 	end,
 }
 
+_G.C_CVar = {
+	GetCVar = function(name)
+		return mockCVars[name]
+	end,
+	SetCVar = function(name, val)
+		mockCVars[name] = tostring(val)
+	end,
+}
+_G.GetCVar = _G.C_CVar.GetCVar
+_G.SetCVar = _G.C_CVar.SetCVar
+
+_G.C_UnitAuras = {
+	GetPlayerAuraBySpellID = function(spellID)
+		return mockPlayerAuras[spellID]
+	end,
+}
+
+_G.C_InstanceEncounter = {
+	IsEncounterInProgress = function()
+		return inEncounter
+	end,
+}
+
+_G.C_Timer = {
+	After = function(seconds, callback)
+		table.insert(scheduledTimers, {
+			triggerTime = currentTime + seconds,
+			callback = callback,
+		})
+	end,
+}
+
+local function AdvanceTime(seconds)
+	currentTime = currentTime + seconds
+	local remaining = {}
+	for _, timer in ipairs(scheduledTimers) do
+		if currentTime >= timer.triggerTime then
+			timer.callback()
+		else
+			table.insert(remaining, timer)
+		end
+	end
+	scheduledTimers = remaining
+end
+
 _G.issecretvalue = function(val)
 	return val == "SECRET_VALUE"
 end
@@ -58,6 +109,7 @@ local function CreateMockWidget(widgetType, name, parent)
 		points = {},
 		attributes = {},
 		events = {},
+		unitEvents = {},
 		scripts = {},
 		text = "",
 	}
@@ -151,6 +203,11 @@ local function CreateMockWidget(widgetType, name, parent)
 
 	function widget:RegisterEvent(event)
 		self.events[event] = true
+	end
+
+	function widget:RegisterUnitEvent(event, unit)
+		self.events[event] = true
+		self.unitEvents[event] = unit
 	end
 
 	function widget:UnregisterEvent(event)
@@ -403,6 +460,135 @@ Addon.UpdateCooldown()
 assertTest(
 	"Cooldown: Cleared when off cooldown",
 	Addon.Cooldown.cooldownStart == nil
+)
+
+-- Test 11: Muting on placement cast (61031)
+mockCVars["Sound_EnableDialog"] = "1"
+_G.TrainWreckerDB.soundMuted = nil
+currentTime = 4000
+FireEvent("UNIT_SPELLCAST_SUCCEEDED", "party1", "guid-mute1", 61031)
+assertTest(
+	"Mute: Placement cast sets Sound_EnableDialog to 0",
+	mockCVars["Sound_EnableDialog"] == "0"
+)
+assertTest(
+	"Mute: soundMuted recorded in TrainWreckerDB",
+	_G.TrainWreckerDB.soundMuted == true
+)
+
+-- Test 12: Placement grace period holds mute against unrelated UNIT_AURA
+mockPlayerAuras[61551] = nil
+FireEvent("UNIT_AURA", "player")
+assertTest(
+	"Grace: Mute held during placement window even without buff",
+	mockCVars["Sound_EnableDialog"] == "0" and _G.TrainWreckerDB.soundMuted == true
+)
+
+-- Test 13: Muting persists when player buff is active
+mockPlayerAuras[61551] = { name = "Train", spellId = 61551 }
+FireEvent("UNIT_AURA", "player")
+assertTest(
+	"Aura: Mute maintained while Train buff active",
+	mockCVars["Sound_EnableDialog"] == "0" and _G.TrainWreckerDB.soundMuted == true
+)
+
+-- Test 14: Unmuting after buff expires and grace period passes
+mockPlayerAuras[61551] = nil
+AdvanceTime(20)
+FireEvent("UNIT_AURA", "player")
+assertTest(
+	"Restore: Sound_EnableDialog restored to 1 when buff and grace period expire",
+	mockCVars["Sound_EnableDialog"] == "1"
+)
+assertTest(
+	"Restore: soundMuted flag cleared from TrainWreckerDB",
+	_G.TrainWreckerDB.soundMuted == nil
+)
+
+-- Test 15: Pre-disabled Dialog sound is preserved
+mockCVars["Sound_EnableDialog"] = "0"
+_G.TrainWreckerDB.soundMuted = nil
+currentTime = 5000
+FireEvent("UNIT_SPELLCAST_SUCCEEDED", "party1", "guid-pre-disabled", 61031)
+assertTest(
+	"Preserve Disabled: soundMuted flag is NOT set if already disabled",
+	_G.TrainWreckerDB.soundMuted == nil
+)
+assertTest(
+	"Preserve Disabled: Sound_EnableDialog remains 0",
+	mockCVars["Sound_EnableDialog"] == "0"
+)
+AdvanceTime(20)
+FireEvent("UNIT_AURA", "player")
+assertTest(
+	"Preserve Disabled: Dialog sound remains 0 after expiration",
+	mockCVars["Sound_EnableDialog"] == "0"
+)
+
+-- Test 16: Active boss encounter prevents muting
+mockCVars["Sound_EnableDialog"] = "1"
+_G.TrainWreckerDB.soundMuted = nil
+inEncounter = true
+currentTime = 6000
+FireEvent("UNIT_SPELLCAST_SUCCEEDED", "party1", "guid-encounter", 61031)
+assertTest(
+	"Encounter: Dialog sound not muted during boss encounters",
+	mockCVars["Sound_EnableDialog"] == "1"
+)
+assertTest(
+	"Encounter: soundMuted not set during boss encounters",
+	_G.TrainWreckerDB.soundMuted == nil
+)
+inEncounter = false
+
+-- Test 17: Train Wrecker cast (62943) cancels hold window and restores sound
+mockCVars["Sound_EnableDialog"] = "1"
+_G.TrainWreckerDB.soundMuted = nil
+mockPlayerAuras[61551] = nil
+currentTime = 7000
+FireEvent("UNIT_SPELLCAST_SUCCEEDED", "party1", "guid-train-wrecker-test", 61031)
+assertTest(
+	"Wrecker Restore: Muted on train placement",
+	mockCVars["Sound_EnableDialog"] == "0" and _G.TrainWreckerDB.soundMuted == true
+)
+FireEvent("UNIT_SPELLCAST_SUCCEEDED", "player", "guid-wrecker-used", 62943)
+assertTest(
+	"Wrecker Restore: Sound restored immediately upon Train Wrecker cast",
+	mockCVars["Sound_EnableDialog"] == "1"
+)
+assertTest(
+	"Wrecker Restore: soundMuted cleared upon Train Wrecker cast",
+	_G.TrainWreckerDB.soundMuted == nil
+)
+
+-- Test 18: Login / reload recovery restores sound if player logged out muted
+mockCVars["Sound_EnableDialog"] = "0"
+_G.TrainWreckerDB.soundMuted = true
+mockPlayerAuras[61551] = nil
+FireEvent("PLAYER_ENTERING_WORLD", true, false)
+assertTest(
+	"Login Recovery: Restores Dialog sound if logged out while muted",
+	mockCVars["Sound_EnableDialog"] == "1"
+)
+assertTest(
+	"Login Recovery: Clears soundMuted on login",
+	_G.TrainWreckerDB.soundMuted == nil
+)
+
+-- Test 19: Login / reload recovery keeps muted if player still has buff
+mockCVars["Sound_EnableDialog"] = "0"
+_G.TrainWreckerDB.soundMuted = true
+mockPlayerAuras[61551] = { name = "Train", spellId = 61551 }
+FireEvent("PLAYER_ENTERING_WORLD", false, true)
+assertTest(
+	"Reload with Buff: Dialog sound remains muted if player still has buff",
+	mockCVars["Sound_EnableDialog"] == "0" and _G.TrainWreckerDB.soundMuted == true
+)
+mockPlayerAuras[61551] = nil
+FireEvent("UNIT_AURA", "player")
+assertTest(
+	"Reload with Buff: Sound restored after buff expires",
+	mockCVars["Sound_EnableDialog"] == "1" and _G.TrainWreckerDB.soundMuted == nil
 )
 
 print(string.format("\nResults: %d passed, %d failed", passed, failed))

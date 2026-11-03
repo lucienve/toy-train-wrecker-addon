@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0
+
+- Added automatic Dialog sound channel muting while a Toy Train Set is present
+  (on placement cast `61031`, periodic pulses `61551`, and player buff `61551`).
+- Added automatic restoration of Dialog sound settings when the train effect
+  expires, when the train is wrecked, or upon login if the session ended while
+  muted.
+- Added active encounter safeguards
+  (`C_InstanceEncounter.IsEncounterInProgress`) to prevent muting during boss
+  encounters.
+
 ## 1.0.0
 
 - Initial release of Train Wrecker (`TrainWrecker`).

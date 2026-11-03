@@ -20,8 +20,12 @@ Set is placed nearby and prompts you to deploy the Wind-Up Train Wrecker.
   combat encounters.
 - **Auto-Dismiss:** Automatically closes the dialog as soon as you successfully
   summon the Wind-Up Train Wrecker.
-- **No Sound Muting:** Silences trains purely through in-game gameplay items
-  without tampering with sound channels or audio files.
+- **Automatic Sound Muting:** Automatically mutes the Dialog sound channel
+  whenever a Toy Train Set is placed nearby, pulses, or applies the Train buff
+  to your character, silencing forced train emotes. Your original setting is
+  automatically restored once the train effect ends or upon login if you logged
+  out while muted. Sound muting is safely suspended during active dungeon and
+  raid boss encounters.
 
 ## Commands
 
