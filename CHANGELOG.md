@@ -1,26 +1,24 @@
 # Changelog
 
-## 1.1.0
+## v0.9.0
 
-- Added automatic Dialog sound channel muting while a Toy Train Set is present
-  (on placement cast `61031`, periodic pulses `61551`, and player buff `61551`).
-- Added automatic restoration of Dialog sound settings when the train effect
-  expires, when the train is wrecked, or upon login if the session ended while
-  muted.
-- Added active encounter safeguards
-  (`C_InstanceEncounter.IsEncounterInProgress`) to prevent muting during boss
-  encounters.
+- Added automatic Dialog sound muting while a Toy Train Set is active nearby,
+  silencing the forced train emote vocalizations.
+- Added automatic restoration of your original Dialog audio settings once the
+  train effect expires, when the train is destroyed with the Wind-Up Train
+  Wrecker, or upon login if a session ended while muted.
+- Added boss encounter safety to suspend sound muting during active dungeon and
+  raid encounters so vital combat voice callouts are never missed.
 
-## 1.0.0
+## v0.8.0
 
 - Initial release of Train Wrecker (`TrainWrecker`).
-- Added automatic detection for Toy Train Set placement (`61031`) and pulses
-  (`61551`).
-- Added movable "Silence the train" dialog with culprit player attribution.
-- Added `SecureActionButtonTemplate` button with cooldown swipe overlay for the
-  Wind-Up Train Wrecker (`45057`).
-- Added Dalaran vendor directions when the toy is unowned.
-- Added robust combat lockdown queueing and dragging guards.
+- Added automatic detection for nearby Toy Train Set placements and pulses, with
+  culprit player attribution.
+- Added movable "Silence the train" dialog with a one-click button to summon the
+  Wind-Up Train Wrecker toy and a live cooldown swipe overlay.
+- Added vendor directions to Jepetto Joybuzz in Dalaran when the toy is unowned.
+- Added combat lockdown safeguards and state queueing to prevent UI errors.
 - Added `/trainwrecker` and `/tw` slash commands.
 - Added multi-flavor support for Retail (`120100`) and Mists of Pandaria Classic
   (`50504`).
