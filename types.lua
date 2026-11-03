@@ -5,6 +5,7 @@
 ---@field relativePoint? string
 ---@field x? number
 ---@field y? number
+---@field soundMuted? boolean
 
 ---@class TrainWreckerLocale
 ---@field ["Silence the train"] string
@@ -31,6 +32,9 @@
 ---@class TrainWreckerAddon
 ---@field L TrainWreckerLocale
 ---@field HasTrainWrecker fun(): boolean, ("toy"|"item")?
+---@field HasTrainBuff fun(): boolean
+---@field MuteTrainSound fun()
+---@field RestoreTrainSound fun()
 ---@field ShowTrainDialog fun(culpritName?: string)
 ---@field HideTrainDialog fun()
 ---@field RefreshTrainDialog fun()
