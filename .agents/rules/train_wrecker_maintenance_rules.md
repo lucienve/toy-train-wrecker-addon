@@ -135,3 +135,63 @@ Always validate changes through the three-pillar quality gate prior to staging:
    - Run bytecode syntax checks:
      `luac -p locales/*.lua core/*.lua ui/*.lua types.lua tests/test_train_wrecker.lua`.
    - Run unit test suite: `lua tests/test_train_wrecker.lua`.
+
+---
+
+## 4. Release Process & CurseForge Deployment
+
+The addon uses `BigWigsMods/packager@v2` triggered by pushing annotated Git tags
+to GitHub, which packages the release and publishes it to CurseForge (Project ID
+`1779465`).
+
+### 1. Proactive Release Suggestions
+
+After completing a major feature, significant enhancement, or notable bug fix,
+proactively ask the operator if they would like to prepare a new release.
+
+### 2. Semantic Version Incrementing
+
+Inspect the latest Git tags using `git tag -l` and recommend an appropriate
+semantic version tag (`vX.Y.Z`):
+
+- **Major (`vX.0.0`):** Breaking changes, massive architectural overhauls, or
+  major milestones.
+- **Minor (`vX.Y.0` / `v0.Y.0`):** New gameplay features, significant
+  enhancements (e.g., automatic Dialog sound muting), or new UI modules.
+- **Patch (`vX.Y.Z`):** Bug fixes, localization updates, or WoW client
+  `## Interface:` bumps for patch releases.
+
+### 3. Player-Friendly Changelog (`CHANGELOG.md`)
+
+- Add a new section at the top of `CHANGELOG.md` matching the target version tag
+  (e.g., `## v0.9.0`).
+- Write clear, concise, player-friendly bullet points focusing on gameplay
+  impact and user experience rather than internal function names or spell IDs.
+- Wrap all Markdown prose at 80 characters.
+- Stage `CHANGELOG.md` (`git add CHANGELOG.md` with `BypassSandbox: true`) and
+  pause for operator review and commit.
+
+### 4. Tagging and Publishing Flow
+
+Because `BigWigsMods/packager` packages the exact commit pointed to by the tag,
+the tag must never be created until after the changelog commit is completed:
+
+1. **Commit Verification:** Confirm with the operator that all changes and
+   `CHANGELOG.md` updates have been committed to `main`.
+2. **Create Annotated Tag:** Create an annotated Git tag matching the release
+   version on `HEAD`:
+
+   ```bash
+   git tag -a vX.Y.Z -m "Release vX.Y.Z"
+   ```
+
+3. **Push to GitHub:** Push both the branch commit and the new tag to GitHub:
+
+   ```bash
+   git push origin main
+   git push origin vX.Y.Z
+   ```
+
+4. **Automated CI/CD:** GitHub Actions triggers `.github/workflows/release.yml`,
+   runs the test suite, replaces `@project-version@` in `TrainWrecker.toc`, and
+   uploads the release archive and changelog to CurseForge.

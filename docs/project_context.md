@@ -80,6 +80,17 @@ destroy the train.
    - Suspends muting during active boss encounters via
      `C_InstanceEncounter.IsEncounterInProgress()`.
 
+10. **CurseForge Tag-Driven Release Workflow & Versioning:**
+    - Releases are triggered by pushing annotated Git tags matching `v*` to
+      GitHub, invoking
+      [.github/workflows/release.yml](../.github/workflows/release.yml).
+    - `BigWigsMods/packager@v2` substitutes `@project-version@` in
+      [TrainWrecker.toc](../TrainWrecker.toc) with the tag name, parses
+      [CHANGELOG.md](../CHANGELOG.md), and uploads the packaged zip to
+      CurseForge.
+    - Version tags follow semantic versioning (`v0.8.0`, `v0.9.0`, etc.) with
+      player-friendly changelogs committed prior to tag creation.
+
 ## Completed Tasks
 
 - [x] Initial repository structure and Git configuration
@@ -107,3 +118,4 @@ destroy the train.
       [.github/workflows/release.yml](../.github/workflows/release.yml)
 - [x] User documentation in [README.md](../README.md) and
       [CHANGELOG.md](../CHANGELOG.md)
+- [x] CurseForge release process and changelog alignment
