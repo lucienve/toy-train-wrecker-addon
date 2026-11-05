@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.9.1
+
+- Fixed an issue where walking up to an already-active Toy Train Set muted the
+  dialog audio but did not open the "Silence the train" window.
+- Fixed an issue where audio restoration could occasionally fail to re-enable
+  your Dialog sound settings after the train effect expired.
+- Added in-game chat confirmation notices when a Toy Train Set is placed,
+  pulsed, or detected on your character.
+- Added in-game chat messages confirming when dialog audio is muted and
+  subsequently re-enabled.
+
 ## v0.9.0
 
 - Added automatic Dialog sound muting while a Toy Train Set is active nearby,
