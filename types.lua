@@ -15,6 +15,11 @@
 ---@field ["Missing Toy Message"] string
 ---@field ["Close"] string
 ---@field ["Cannot Open In Combat"] string
+---@field ["Train Pulse Detected"] string
+---@field ["Train Aura Detected"] string
+---@field ["Train Wrecker Deployed"] string
+---@field ["Audio Muted"] string
+---@field ["Audio Restored"] string
 ---@field [string] string
 
 ---@class TrainWreckerDialog : Frame, BackdropTemplate
@@ -31,6 +36,7 @@
 
 ---@class TrainWreckerAddon
 ---@field L TrainWreckerLocale
+---@field Print fun(msg: string)
 ---@field HasTrainWrecker fun(): boolean, ("toy"|"item")?
 ---@field HasTrainBuff fun(): boolean
 ---@field MuteTrainSound fun()

@@ -91,6 +91,22 @@ destroy the train.
     - Version tags follow semantic versioning (`v0.8.0`, `v0.9.0`, etc.) with
       player-friendly changelogs committed prior to tag creation.
 
+11. **Aura Walk-Up Trigger, Audio Restoration & Chat Notifications:**
+    - Triggers `Addon.ShowTrainDialog()` when `UNIT_AURA` or
+      `PLAYER_ENTERING_WORLD` detects the player receiving the Toy Train Set
+      aura (`61551`), ensuring the dialog opens even when walking up to an
+      already-active train set where `UNIT_SPELLCAST_SUCCEEDED` did not fire.
+    - Corrected `muteHoldUntil` upvalue scoping so `Addon.RestoreTrainSound()`
+      properly resets the local hold window rather than writing to a global
+      leak.
+    - Guarded `C_Timer.After` callbacks against frame-boundary timer drift so
+      sub-millisecond jitter does not leave audio muted after expiration.
+    - Restores audio immediately when the Wind-Up Train Wrecker (`62943`) is
+      deployed by the player.
+    - Added player chat confirmation messages for train placement, pulse
+      detection, aura detection, audio muting, audio restoration, and Train
+      Wrecker deployment.
+
 ## Completed Tasks
 
 - [x] Initial repository structure and Git configuration
@@ -119,3 +135,4 @@ destroy the train.
 - [x] User documentation in [README.md](../README.md) and
       [CHANGELOG.md](../CHANGELOG.md)
 - [x] CurseForge release process and changelog alignment
+- [x] Aura walk-up detection, audio restoration fixes, and chat feedback

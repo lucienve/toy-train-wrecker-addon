@@ -13,6 +13,26 @@ local mockCVars = {
 }
 local mockPlayerAuras = {}
 local scheduledTimers = {}
+local printedMessages = {}
+local realPrint = print
+_G.print = function(...)
+	local args = { ... }
+	table.insert(printedMessages, table.concat(args, "\t"))
+	realPrint(...)
+end
+
+local function HasMessage(sub)
+	for i = #printedMessages, 1, -1 do
+		if string.find(printedMessages[i], sub, 1, true) then
+			return true
+		end
+	end
+	return false
+end
+
+local function ClearMessages()
+	printedMessages = {}
+end
 
 -- Mock global WoW environment
 rawset(_G, "UIParent", {})
@@ -589,6 +609,106 @@ FireEvent("UNIT_AURA", "player")
 assertTest(
 	"Reload with Buff: Sound restored after buff expires",
 	mockCVars["Sound_EnableDialog"] == "1" and _G.TrainWreckerDB.soundMuted == nil
+)
+
+-- Test 20: Walking near an active toy train triggers dialog and muting via aura
+Addon.HideTrainDialog()
+mockCVars["Sound_EnableDialog"] = "1"
+_G.TrainWreckerDB.soundMuted = nil
+mockPlayerAuras[61551] = { name = "Train", spellId = 61551 }
+currentTime = 9000
+ClearMessages()
+FireEvent("UNIT_AURA", "player")
+assertTest(
+	"Aura Walk-Up: Dialog shown when player receives train aura",
+	Addon.DialogFrame:IsShown() == true
+)
+assertTest(
+	"Aura Walk-Up: Audio muted when player receives train aura",
+	mockCVars["Sound_EnableDialog"] == "0" and _G.TrainWreckerDB.soundMuted == true
+)
+assertTest(
+	"Aura Walk-Up: Chat message for aura detection printed",
+	HasMessage("Toy Train Set aura detected on player.")
+)
+assertTest(
+	"Aura Walk-Up: Chat message for audio muting printed",
+	HasMessage("Dialog audio muted while Toy Train Set is active.")
+)
+
+-- Test 21: Aura expiration restores audio and prints chat message
+mockPlayerAuras[61551] = nil
+ClearMessages()
+FireEvent("UNIT_AURA", "player")
+assertTest(
+	"Aura Fade: Sound restored when train aura expires",
+	mockCVars["Sound_EnableDialog"] == "1" and _G.TrainWreckerDB.soundMuted == nil
+)
+assertTest(
+	"Aura Fade: Chat message for audio restoration printed",
+	HasMessage("Dialog audio re-enabled.")
+)
+
+-- Test 22: Timer jitter guard restores audio across frame boundaries
+mockCVars["Sound_EnableDialog"] = "1"
+_G.TrainWreckerDB.soundMuted = nil
+mockPlayerAuras[61551] = nil
+currentTime = 10000
+FireEvent("UNIT_SPELLCAST_SUCCEEDED", "party1", "guid-jitter", 61031)
+assertTest(
+	"Jitter Guard: Muted on placement",
+	mockCVars["Sound_EnableDialog"] == "0" and _G.TrainWreckerDB.soundMuted == true
+)
+-- Simulate timer triggering slightly before exact integer threshold (e.g., 14.98s)
+AdvanceTime(14.98)
+assertTest(
+	"Jitter Guard: Audio restored despite sub-millisecond timer jitter",
+	mockCVars["Sound_EnableDialog"] == "1" and _G.TrainWreckerDB.soundMuted == nil
+)
+
+-- Test 23: Immediate sound restoration when 62943 is cast while player still has buff
+mockCVars["Sound_EnableDialog"] = "1"
+_G.TrainWreckerDB.soundMuted = nil
+mockPlayerAuras[61551] = { name = "Train", spellId = 61551 }
+currentTime = 11000
+FireEvent("UNIT_AURA", "player")
+assertTest(
+	"Wrecker Immediate: Muted while buff active",
+	_G.TrainWreckerDB.soundMuted == true
+)
+ClearMessages()
+FireEvent("UNIT_SPELLCAST_SUCCEEDED", "player", "guid-wrecker-immediate", 62943)
+assertTest(
+	"Wrecker Immediate: Sound restored immediately upon wrecker deployment",
+	mockCVars["Sound_EnableDialog"] == "1" and _G.TrainWreckerDB.soundMuted == nil
+)
+assertTest(
+	"Wrecker Immediate: Chat message for wrecker deployment printed",
+	HasMessage("Wind-Up Train Wrecker deployed.")
+)
+assertTest(
+	"Wrecker Immediate: Chat message for audio restoration printed",
+	HasMessage("Dialog audio re-enabled.")
+)
+assertTest(
+	"Wrecker Immediate: Dialog hidden",
+	Addon.DialogFrame:IsShown() == false
+)
+
+-- Test 24: Chat message verification for pulse and placement without culprit
+currentTime = 12000
+ClearMessages()
+FireEvent("UNIT_SPELLCAST_SUCCEEDED", nil, "guid-anon", 61031)
+assertTest(
+	"Chat Messages: Anonymous placement message",
+	HasMessage("A Toy Train Set was detected nearby.")
+)
+currentTime = 12010
+ClearMessages()
+FireEvent("UNIT_SPELLCAST_SUCCEEDED", nil, "guid-pulse-msg", 61551)
+assertTest(
+	"Chat Messages: Pulse message",
+	HasMessage("Toy Train Set pulse detected nearby.")
 )
 
 print(string.format("\nResults: %d passed, %d failed", passed, failed))

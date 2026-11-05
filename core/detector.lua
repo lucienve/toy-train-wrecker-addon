@@ -10,6 +10,11 @@ local DEDUP_WINDOW_SECONDS = 3
 local PLACEMENT_MUTE_SECONDS = 15
 local CVAR_ENABLE_DIALOG = "Sound_EnableDialog"
 
+local lastCastGUID = nil
+local lastCastTime = 0
+local muteHoldUntil = 0
+local hadTrainBuff = false
+
 ---Checks whether the player owns the Wind-Up Train Wrecker as a toy or bag item.
 ---@return boolean isOwned, ("toy"|"item")? sourceType
 function Addon.HasTrainWrecker()
@@ -86,6 +91,9 @@ function Addon.MuteTrainSound()
 		if isEnabled == "1" then
 			db.soundMuted = true
 			SetDialogCVar("0")
+			if Addon.Print and Addon.L and Addon.L["Audio Muted"] then
+				Addon.Print(Addon.L["Audio Muted"])
+			end
 		end
 	end
 end
@@ -96,20 +104,49 @@ function Addon.RestoreTrainSound()
 	if db and db.soundMuted then
 		SetDialogCVar("1")
 		db.soundMuted = nil
+		if Addon.Print and Addon.L and Addon.L["Audio Restored"] then
+			Addon.Print(Addon.L["Audio Restored"])
+		end
 	end
 	muteHoldUntil = 0
 end
 
-local lastCastGUID = nil
-local lastCastTime = 0
-local muteHoldUntil = 0
-
 ---Evaluates current train presence and restores or maintains sound muting.
 local function EvaluateSoundRestore()
-	if Addon.HasTrainBuff() then
+	local hasBuff = Addon.HasTrainBuff()
+	if hasBuff then
 		Addon.MuteTrainSound()
-	elseif GetTime() >= muteHoldUntil then
-		Addon.RestoreTrainSound()
+		if not hadTrainBuff then
+			hadTrainBuff = true
+			local now = GetTime()
+			if (now - lastCastTime) >= DEDUP_WINDOW_SECONDS then
+				lastCastTime = now
+				if Addon.Print and Addon.L and Addon.L["Train Aura Detected"] then
+					Addon.Print(Addon.L["Train Aura Detected"])
+				end
+				if Addon.ShowTrainDialog then
+					Addon.ShowTrainDialog()
+				end
+			end
+		end
+	else
+		hadTrainBuff = false
+		if GetTime() >= muteHoldUntil then
+			Addon.RestoreTrainSound()
+		end
+	end
+end
+
+---Schedules a sound restore evaluation after a delay, accounting for timer jitter.
+---@param delaySeconds number
+local function ScheduleSoundRestore(delaySeconds)
+	if C_Timer and C_Timer.After then
+		C_Timer.After(delaySeconds, function()
+			if GetTime() + 0.05 >= muteHoldUntil then
+				muteHoldUntil = 0
+			end
+			EvaluateSoundRestore()
+		end)
 	end
 end
 
@@ -140,9 +177,7 @@ detectorFrame:SetScript("OnEvent", function(self, event, ...)
 			local now = GetTime()
 			muteHoldUntil = now + PLACEMENT_MUTE_SECONDS
 			Addon.MuteTrainSound()
-			if C_Timer and C_Timer.After then
-				C_Timer.After(PLACEMENT_MUTE_SECONDS, EvaluateSoundRestore)
-			end
+			ScheduleSoundRestore(PLACEMENT_MUTE_SECONDS)
 
 			if
 				(lastCastGUID and castGUID and lastCastGUID == castGUID)
@@ -165,14 +200,30 @@ detectorFrame:SetScript("OnEvent", function(self, event, ...)
 				end
 			end
 
+			if Addon.Print and Addon.L then
+				if culpritName then
+					Addon.Print(string.format(Addon.L["Train Placed By"], culpritName))
+				elseif spellID == TOY_TRAIN_SPELL_ID then
+					Addon.Print(Addon.L["Train Detected Nearby"])
+				else
+					Addon.Print(Addon.L["Train Pulse Detected"])
+				end
+			end
+
 			if Addon.ShowTrainDialog then
 				Addon.ShowTrainDialog(culpritName)
 			end
 		elseif spellID == TRAIN_WRECKER_SPELL_ID and unitTarget == "player" then
+			local now = GetTime()
 			muteHoldUntil = 0
 			lastCastGUID = nil
-			lastCastTime = 0
-			EvaluateSoundRestore()
+			lastCastTime = now
+
+			if Addon.Print and Addon.L and Addon.L["Train Wrecker Deployed"] then
+				Addon.Print(Addon.L["Train Wrecker Deployed"])
+			end
+
+			Addon.RestoreTrainSound()
 
 			if Addon.HideTrainDialog then
 				Addon.HideTrainDialog()

@@ -21,6 +21,12 @@ initFrame:SetScript("OnEvent", function(self, event, name)
 	end
 end)
 
+---Prints a formatted message to chat with the addon prefix.
+---@param msg string
+function Addon.Print(msg)
+	print("|cffff8000TrainWrecker:|r " .. msg)
+end
+
 -- Slash command registrations
 SLASH_TRAINWRECKER1 = "/trainwrecker"
 SLASH_TRAINWRECKER2 = "/tw"
@@ -29,7 +35,7 @@ SlashCmdList["TRAINWRECKER"] = function(_)
 	if InCombatLockdown() then
 		local msg = Addon.L["Cannot Open In Combat"]
 			or "Cannot open the Train Wrecker dialog during combat."
-		print("|cffff8000TrainWrecker:|r " .. msg)
+		Addon.Print(msg)
 		return
 	end
 
