@@ -12,10 +12,10 @@ testing procedures, and release guidelines when maintaining or contributing to
 the **Train Wrecker** (`TrainWrecker`) World of Warcraft addon codebase.
 
 Train Wrecker is a standalone World of Warcraft addon supporting strictly Retail
-(`120100`) and Mists of Pandaria Classic (`50504`) that detects nearby Toy Train
-Sets and prompts the player to silence them with the Wind-Up Train Wrecker. WoW
-Forever and other unsupported flavors are excluded because the Toy Train Set and
-Wind-Up Train Wrecker do not exist in those clients.
+and Mists of Pandaria Classic that detects nearby Toy Train Sets and prompts the
+player to silence them with the Wind-Up Train Wrecker. WoW Forever and other
+unsupported flavors are excluded because the Toy Train Set and Wind-Up Train
+Wrecker do not exist in those clients.
 
 ---
 
@@ -24,11 +24,12 @@ Wind-Up Train Wrecker do not exist in those clients.
 Understand the modular structure, event lifecycles, and combat lockdown
 safeguards before modifying the codebase:
 
-- **`TrainWrecker.toc`:** Multi-flavor TOC manifest specifying interface
-  versions for Retail (`120100`) and Mists of Pandaria Classic (`50504`),
+- **`TrainWrecker.toc`:** Multi-flavor TOC manifest serving as the single source
+  of truth for current Retail and Mists of Pandaria Classic interface versions,
   `## AllowLoadGameType: standard, mists` to exclude WoW Forever and other
   unsupported flavors, metadata, SavedVariables (`TrainWreckerDB`), and
-  CurseForge packaging tags.
+  CurseForge packaging tags. Do not duplicate specific interface numbers in
+  documentation or rules.
 - **`main.xml`:** Root FrameXML manifest loading scripts in topological order:
   1. `locales/locales.xml`
   2. `core/init.lua`

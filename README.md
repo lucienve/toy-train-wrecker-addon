@@ -1,8 +1,8 @@
 # Train Wrecker (`TrainWrecker`)
 
-Train Wrecker is a lightweight World of Warcraft addon supporting both Retail
-(`120100`) and Mists of Pandaria Classic (`50504`) that detects when a Toy Train
-Set is placed nearby and prompts you to deploy the Wind-Up Train Wrecker.
+Train Wrecker is a lightweight World of Warcraft addon supporting Retail and
+Mists of Pandaria Classic that detects when a Toy Train Set is placed nearby and
+prompts you to deploy the Wind-Up Train Wrecker.
 
 ## Features
 
@@ -34,10 +34,11 @@ Set is placed nearby and prompts you to deploy the Wind-Up Train Wrecker.
 
 ## Supported Clients
 
-Only **Retail** and **Mists of Pandaria Classic** are supported:
+Only **Retail** and **Mists of Pandaria Classic** are supported (see
+[TrainWrecker.toc](./TrainWrecker.toc) for current interface versions):
 
-- **Retail:** Interface `120100` (Midnight)
-- **Classic:** Interface `50504` (Mists of Pandaria Classic)
+- **Retail** (Midnight)
+- **Mists of Pandaria Classic**
 
 WoW Forever, other Classic flavors, and special game modes are not supported
 because the Toy Train Set and Wind-Up Train Wrecker do not exist in those

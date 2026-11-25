@@ -2,18 +2,19 @@
 
 ## Project Overview
 
-Train Wrecker is a standalone World of Warcraft addon supporting Retail
-(`120100`) and Mists of Pandaria Classic (`50504`). It listens for nearby Toy
-Train Sets and prompts the player to summon the Wind-Up Train Wrecker toy to
-destroy the train.
+Train Wrecker is a standalone World of Warcraft addon supporting Retail and
+Mists of Pandaria Classic. It listens for nearby Toy Train Sets and prompts the
+player to summon the Wind-Up Train Wrecker toy to destroy the train.
 
 ## Architectural Decisions
 
 1. **Multi-Flavor Interface Support:**
-   - Declared `## Interface: 120100, 50504` and
-     `## AllowLoadGameType: standard, mists` in
+   - Declared multi-flavor `## Interface:` versions (Retail and Mists of
+     Pandaria Classic) and `## AllowLoadGameType: standard, mists` in
      [TrainWrecker.toc](../TrainWrecker.toc), supported by both modern game
      clients and `BigWigsMods/packager@v2`.
+     [TrainWrecker.toc](../TrainWrecker.toc) serves as the single source of
+     truth for current interface numbers.
    - Restricting game types to `standard, mists` ensures only Retail and Mists
      of Pandaria Classic are supported; WoW Forever (and other flavors where the
      Toy Train Set and Wind-Up Train Wrecker do not exist) is explicitly
@@ -142,3 +143,5 @@ destroy the train.
 - [x] CurseForge release process and changelog alignment
 - [x] Aura walk-up detection, audio restoration fixes, and chat feedback
 - [x] Excluded WoW Forever and unsupported flavors via `AllowLoadGameType`
+- [x] Updated Retail interface version and removed hardcoded version numbers
+      from docs
