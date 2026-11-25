@@ -10,9 +10,14 @@ destroy the train.
 ## Architectural Decisions
 
 1. **Multi-Flavor Interface Support:**
-   - Declared `## Interface: 120100, 50504` in
+   - Declared `## Interface: 120100, 50504` and
+     `## AllowLoadGameType: standard, mists` in
      [TrainWrecker.toc](../TrainWrecker.toc), supported by both modern game
      clients and `BigWigsMods/packager@v2`.
+   - Restricting game types to `standard, mists` ensures only Retail and Mists
+     of Pandaria Classic are supported; WoW Forever (and other flavors where the
+     Toy Train Set and Wind-Up Train Wrecker do not exist) is explicitly
+     excluded so the addon does not appear as valid or loadable there.
    - Avoids separate TOC files and simplifies CI/CD release flows.
 
 2. **Declarative FrameXML Button Template:**
@@ -136,3 +141,4 @@ destroy the train.
       [CHANGELOG.md](../CHANGELOG.md)
 - [x] CurseForge release process and changelog alignment
 - [x] Aura walk-up detection, audio restoration fixes, and chat feedback
+- [x] Excluded WoW Forever and unsupported flavors via `AllowLoadGameType`

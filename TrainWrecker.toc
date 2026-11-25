@@ -1,4 +1,5 @@
 ## Interface: 120100, 50504
+## AllowLoadGameType: standard, mists
 ## Title: Train Wrecker
 ## Notes: Detects Toy Train Sets and prompts to deploy the Wind-Up Train Wrecker.
 ## Author: LVE

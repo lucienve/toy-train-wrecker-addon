@@ -34,8 +34,16 @@ Set is placed nearby and prompts you to deploy the Wind-Up Train Wrecker.
 
 ## Supported Clients
 
-- **Retail:** Interface `120100` (The War Within / Midnight)
+Only **Retail** and **Mists of Pandaria Classic** are supported:
+
+- **Retail:** Interface `120100` (Midnight)
 - **Classic:** Interface `50504` (Mists of Pandaria Classic)
+
+WoW Forever, other Classic flavors, and special game modes are not supported
+because the Toy Train Set and Wind-Up Train Wrecker do not exist in those
+clients. [TrainWrecker.toc](./TrainWrecker.toc) enforces
+`## AllowLoadGameType: standard, mists` so the addon does not appear as valid
+or loadable outside Retail and Mists of Pandaria Classic.
 
 ## License
 
