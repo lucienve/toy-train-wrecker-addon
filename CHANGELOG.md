@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.0.0
+
+- First stable release of Train Wrecker.
+- Updated Retail compatibility for World of Warcraft Patch 12.1.5.
+- Restricted addon loading strictly to Retail and Mists of Pandaria Classic so
+  the addon no longer appears in WoW Forever or other unsupported game versions
+  where the Toy Train Set and Wind-Up Train Wrecker do not exist.
+
 ## v0.9.1
 
 - Fixed an issue where walking up to an already-active Toy Train Set muted the
